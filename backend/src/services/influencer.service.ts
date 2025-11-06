@@ -142,7 +142,7 @@ Create a warm, professional email that:
 `;
 
       const response = await AIService.chatCopilot(prompt);
-      return response.success ? response.reply : '';
+      return response.success ? (response.reply || '') : '';
     } catch (error: any) {
       console.error('Generate Outreach Error:', error);
       throw error;

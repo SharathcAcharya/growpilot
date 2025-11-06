@@ -58,7 +58,10 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: 'user-storage',
-      partialize: (state) => ({ userProfile: state.userProfile }),
+      // Only persist serializable data - don't persist firebaseUser (causes hydration issues)
+      partialize: (state) => ({ 
+        userProfile: state.userProfile 
+      }),
     }
   )
 );

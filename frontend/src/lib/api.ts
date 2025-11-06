@@ -15,13 +15,17 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   async (config) => {
+    // Get Firebase auth token
     if (auth && auth.currentUser) {
       try {
         const token = await auth.currentUser.getIdToken();
         config.headers.Authorization = `Bearer ${token}`;
+        console.log('✅ Firebase token added to request:', config.url);
       } catch (error) {
-        console.warn('Failed to get auth token:', error);
+        console.error('❌ Failed to get Firebase auth token:', error);
       }
+    } else {
+      console.warn('⚠️ No authenticated user - request will be unauthorized');
     }
     return config;
   },

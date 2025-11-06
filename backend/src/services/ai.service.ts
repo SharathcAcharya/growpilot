@@ -95,8 +95,8 @@ Format as JSON with keys: headlines, descriptions, ctas
 
       return {
         success: true,
-        url: response.data[0]?.url,
-        revisedPrompt: response.data[0]?.revised_prompt,
+        url: response.data?.[0]?.url || '',
+        revisedPrompt: response.data?.[0]?.revised_prompt || prompt,
       };
     } catch (error: any) {
       console.error('AI Image Generation Error:', error);

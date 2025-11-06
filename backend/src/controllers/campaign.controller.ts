@@ -310,7 +310,19 @@ export const generateCampaignCreative = async (req: AuthRequest, res: Response):
     }
 
     // Create creative objects
-    const creatives = [];
+    type CreativeType = {
+      id: string;
+      type: 'image' | 'video' | 'carousel';
+      url: string;
+      thumbnail?: string;
+      headline: string;
+      description: string;
+      cta: string;
+      aiGenerated: boolean;
+      prompt?: string;
+    };
+
+    const creatives: CreativeType[] = [];
     const headlines = creativeResult.data.headlines || [];
     const descriptions = creativeResult.data.descriptions || [];
     const ctas = creativeResult.data.ctas || [];
@@ -318,7 +330,7 @@ export const generateCampaignCreative = async (req: AuthRequest, res: Response):
     for (let i = 0; i < Math.min(headlines.length, 3); i++) {
       creatives.push({
         id: uuidv4(),
-        type: imageUrl ? 'image' : 'text',
+        type: 'image' as const,
         url: imageUrl || '',
         headline: headlines[i],
         description: descriptions[i] || '',
@@ -329,7 +341,9 @@ export const generateCampaignCreative = async (req: AuthRequest, res: Response):
     }
 
     // Update campaign with creatives
-    campaign.creatives.push(...creatives);
+    for (const creative of creatives) {
+      campaign.creatives.push(creative);
+    }
     await campaign.save();
 
     res.json({

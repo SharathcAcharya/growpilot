@@ -39,10 +39,10 @@ export const generateContent = async (req: AuthRequest, res: Response): Promise<
       type,
       platform,
       title: topic,
-      content: result.content,
+      content: result.content || '',
       metadata: {
-        wordCount: result.content.split(/\s+/).length,
-        readingTime: Math.ceil(result.content.split(/\s+/).length / 200),
+        wordCount: (result.content || '').split(/\s+/).length,
+        readingTime: Math.ceil((result.content || '').split(/\s+/).length / 200),
         tone,
         keywords,
       },

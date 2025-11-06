@@ -113,7 +113,25 @@ export const scoreInfluencer = async (req: AuthRequest, res: Response): Promise<
     const { brandName, industry, targetAudience } = req.body;
     const brandContext = { name: brandName, industry, targetAudience };
 
-    const scoreResult = await InfluencerService.scoreInfluencer(influencer.toObject(), brandContext);
+    // Map influencer to InfluencerProfile format
+    const influencerProfile = {
+      username: influencer.username,
+      displayName: influencer.displayName,
+      platform: influencer.platform,
+      profileUrl: influencer.profileUrl,
+      avatarUrl: influencer.avatarUrl,
+      bio: influencer.bio,
+      category: influencer.category,
+      followers: influencer.metrics.followers,
+      following: influencer.metrics.following,
+      posts: influencer.metrics.posts,
+      avgLikes: influencer.metrics.avgLikes,
+      avgComments: influencer.metrics.avgComments,
+      avgViews: influencer.metrics.avgViews,
+      engagementRate: influencer.metrics.engagementRate,
+    };
+
+    const scoreResult = await InfluencerService.scoreInfluencer(influencerProfile, brandContext);
 
     if (scoreResult.success) {
       influencer.aiScore = {
@@ -187,8 +205,26 @@ export const generateOutreach = async (req: AuthRequest, res: Response): Promise
 
     const { brandInfo, campaignDetails } = req.body;
 
+    // Map influencer to InfluencerProfile format
+    const influencerProfile = {
+      username: influencer.username,
+      displayName: influencer.displayName,
+      platform: influencer.platform,
+      profileUrl: influencer.profileUrl,
+      avatarUrl: influencer.avatarUrl,
+      bio: influencer.bio,
+      category: influencer.category,
+      followers: influencer.metrics.followers,
+      following: influencer.metrics.following,
+      posts: influencer.metrics.posts,
+      avgLikes: influencer.metrics.avgLikes,
+      avgComments: influencer.metrics.avgComments,
+      avgViews: influencer.metrics.avgViews,
+      engagementRate: influencer.metrics.engagementRate,
+    };
+
     const template = await InfluencerService.generateOutreachTemplate(
-      influencer.toObject(),
+      influencerProfile,
       brandInfo,
       campaignDetails
     );

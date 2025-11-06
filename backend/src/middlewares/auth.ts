@@ -29,12 +29,22 @@ export const authenticate = async (
 
     const token = authHeader.split('Bearer ')[1];
 
+    if (!token) {
+      res.status(401).json({
+        success: false,
+        message: 'Unauthorized - Invalid token format',
+      });
+      return;
+    }
+
+    // Verify Firebase ID token
     try {
       const decodedToken = await getAuth().verifyIdToken(token);
       req.user = {
         uid: decodedToken.uid,
         email: decodedToken.email,
       };
+      console.log('✅ User authenticated:', req.user.email);
       next();
     } catch (error: any) {
       console.error('Token verification error:', error);
@@ -67,14 +77,16 @@ export const optionalAuth = async (
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split('Bearer ')[1];
-      try {
-        const decodedToken = await getAuth().verifyIdToken(token);
-        req.user = {
-          uid: decodedToken.uid,
-          email: decodedToken.email,
-        };
-      } catch (error) {
-        // Ignore token errors for optional auth
+      if (token) {
+        try {
+          const decodedToken = await getAuth().verifyIdToken(token);
+          req.user = {
+            uid: decodedToken.uid,
+            email: decodedToken.email,
+          };
+        } catch (error) {
+          // Ignore token errors for optional auth
+        }
       }
     }
 

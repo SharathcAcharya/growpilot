@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { CONTENT_TYPES } from '@/lib/constants';
 import { DocumentTextIcon, SparklesIcon } from '@heroicons/react/24/outline';
@@ -10,6 +10,24 @@ export default function ContentPage() {
   const [content, setContent] = useState<any[]>([]);
   const [selectedContent, setSelectedContent] = useState<any>(null);
   const [showGenerator, setShowGenerator] = useState(false);
+
+  // Load real content from API
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      const response = await api.getContent();
+      setContent(response.data.data || []);
+      if (response.data.data && response.data.data.length > 0) {
+        setSelectedContent(response.data.data[0]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch content:', error);
+      setContent([]);
+    }
+  };
 
   const [formData, setFormData] = useState({
     type: 'blog',

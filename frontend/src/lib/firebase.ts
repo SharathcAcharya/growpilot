@@ -13,27 +13,31 @@ const firebaseConfig = {
 };
 
 // Check if Firebase is configured
-const isFirebaseConfigured = process.env.NEXT_PUBLIC_FIREBASE_API_KEY && 
+const isFirebaseConfigured = typeof window !== 'undefined' && 
+                              process.env.NEXT_PUBLIC_FIREBASE_API_KEY && 
                               process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== 'demo-api-key' &&
                               process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== 'your_firebase_api_key';
 
-// Initialize Firebase only if properly configured
+// Initialize Firebase only if properly configured and in browser
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
 let storage: FirebaseStorage | null = null;
 
-if (isFirebaseConfigured) {
-  if (!getApps().length) {
-    app = initializeApp(firebaseConfig);
+if (typeof window !== 'undefined') {
+  if (isFirebaseConfigured) {
+    if (!getApps().length) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      app = getApps()[0];
+    }
+    auth = getAuth(app);
+    db = getFirestore(app);
+    storage = getStorage(app);
+    console.log('✅ Firebase initialized');
   } else {
-    app = getApps()[0];
+    console.warn('⚠️ Firebase not configured. Add credentials to frontend/.env.local');
   }
-  auth = getAuth(app);
-  db = getFirestore(app);
-  storage = getStorage(app);
-} else {
-  console.warn('⚠️ Firebase is not configured. Using demo mode. Please add Firebase credentials to .env.local');
 }
 
 // Export with null checks

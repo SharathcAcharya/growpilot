@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest } from '../middlewares/auth';
 import { AIService } from '../services/ai.service';
 
 // Chat with AI Copilot
