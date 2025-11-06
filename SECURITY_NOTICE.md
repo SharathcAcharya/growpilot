@@ -16,7 +16,7 @@ On November 6, 2025, exposed credentials were detected in documentation files:
 
 **Before:**
 ```javascript
-apiKey: "AIzaSyA39eLZW5Vco1aSveQBPoV08XK1p3J6lEw"  // ❌ Exposed
+apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // ❌ Exposed
 ```
 
 **After:**
@@ -63,7 +63,7 @@ Even though the exposed credentials are now removed from documentation, **they w
 #### 1. Rotate Firebase API Key (HIGH PRIORITY)
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select project: **growpilot-1c7c2**
+2. Select your project
 3. Go to Settings > General
 4. Under "Your apps" section, find Web app
 5. Click "..." menu → **Regenerate API Key** (if available)
@@ -77,18 +77,18 @@ Even though the exposed credentials are now removed from documentation, **they w
 
 1. Go to [MongoDB Atlas](https://cloud.mongodb.com/)
 2. Select your cluster
-3. Database Access → Find user: `tempgpt369_db_user`
+3. Database Access → Find your database user
 4. Click "Edit" → "Edit Password"
 5. Generate new strong password
 6. Update `backend/.env` with new password:
    ```env
-   MONGODB_URI=mongodb+srv://tempgpt369_db_user:NEW_PASSWORD@cluster1.iyfpu26.mongodb.net/growpilot
+   MONGODB_URI=mongodb+srv://your_username:NEW_PASSWORD@your_cluster.mongodb.net/your_database
    ```
 
 #### 3. Rotate OpenAI API Key (RECOMMENDED)
 
 1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
-2. Revoke current key: `sk-proj-_tRPOE...`
+2. Revoke your current key
 3. Create new API key
 4. Update `backend/.env`:
    ```env

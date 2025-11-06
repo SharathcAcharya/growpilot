@@ -154,7 +154,7 @@ Open http://localhost:3000 and try to:
 3. Check if authentication works
 
 ### 3. Verify in Firebase Console
-Go to: https://console.firebase.google.com/project/growpilot-1c7c2/authentication/users
+Go to: Firebase Console → Your Project → Authentication → Users
 
 You should see your newly created user appear in the Authentication users list.
 
@@ -202,7 +202,7 @@ If you accidentally committed the key:
 
 ### Error: "Permission denied"
 - Verify the service account has "Firebase Admin" role
-- Check that the project ID matches: `growpilot-1c7c2`
+- Check that the project ID matches your Firebase project
 
 ### Users not appearing in MongoDB
 - This is normal! Users are stored in **Firebase Authentication**
@@ -213,7 +213,7 @@ If you accidentally committed the key:
 
 ## 📞 Need Help?
 
-- **Firebase Console:** https://console.firebase.google.com/project/growpilot-1c7c2
+- **Firebase Console:** https://console.firebase.google.com/
 - **Firebase Auth Docs:** https://firebase.google.com/docs/auth
 - **Firebase Admin SDK:** https://firebase.google.com/docs/admin/setup
 - **Project Docs:** See `DATABASE_SETUP.md` for complete database setup
