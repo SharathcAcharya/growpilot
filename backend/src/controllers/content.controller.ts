@@ -20,6 +20,24 @@ export const generateContent = async (req: AuthRequest, res: Response): Promise<
 
     const { type, topic, keywords, tone, length, brandId, platform } = req.body;
 
+    // Validate required fields
+    if (!topic) {
+      res.status(400).json({ success: false, message: 'Topic is required' });
+      return;
+    }
+
+    // Check if OpenRouter API key is configured
+    if (!process.env.OPENROUTER_API_KEY) {
+      console.error('OpenRouter API key not configured');
+      res.status(500).json({ 
+        success: false, 
+        message: 'AI service not configured. Please add OPENROUTER_API_KEY to environment variables.' 
+      });
+      return;
+    }
+
+    const aiModel = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324';
+    console.log(`Generating content with OpenRouter (${aiModel}) for topic:`, topic);
     const result = await AIService.generateContent({
       type,
       topic,
@@ -29,15 +47,19 @@ export const generateContent = async (req: AuthRequest, res: Response): Promise<
     });
 
     if (!result.success) {
-      res.status(500).json({ success: false, message: 'Failed to generate content' });
+      console.error('AI generation failed:', result.error);
+      res.status(500).json({ 
+        success: false, 
+        message: result.error || 'Failed to generate content with AI' 
+      });
       return;
     }
 
     const content = new Content({
       userId: user._id,
-      brandId,
-      type,
-      platform,
+      brandId: brandId || 'default',
+      type: type || 'blog',
+      platform: platform || 'website',
       title: topic,
       content: result.content || '',
       metadata: {
@@ -49,9 +71,10 @@ export const generateContent = async (req: AuthRequest, res: Response): Promise<
       aiGenerated: {
         isAI: true,
         prompt: topic,
-        model: 'gpt-4o',
+        model: result.model || aiModel,
         tokensUsed: result.tokensUsed,
       },
+      status: 'draft',
     });
 
     await content.save();
@@ -61,7 +84,10 @@ export const generateContent = async (req: AuthRequest, res: Response): Promise<
     res.status(201).json({ success: true, data: content });
   } catch (error: any) {
     console.error('Generate Content Error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || 'An error occurred while generating content'
+    });
   }
 };
 

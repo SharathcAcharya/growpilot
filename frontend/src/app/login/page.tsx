@@ -5,27 +5,42 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUserStore } from '@/store/userStore';
 import { auth } from '@/lib/firebase';
-import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import Toast from '@/components/Toast';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { firebaseUser } = useUserStore();
+  const { firebaseUser, logout } = useUserStore();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   
   // Email/Password form
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    if (firebaseUser) {
-      router.push('/dashboard');
+    setIsMounted(true);
+  }, []);
+
+  // Removed auto-redirect - let user choose to logout or go to dashboard
+
+  const handleLogout = async () => {
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
+      logout();
+      setToastMessage('✅ Logged out successfully!');
+      setShowToast(true);
+    } catch (error) {
+      console.error('Logout error:', error);
+      setError('Failed to logout. Please try again.');
     }
-  }, [firebaseUser, router]);
+  };
 
   const handleGoogleSignIn = async () => {
     if (!auth) {
@@ -54,6 +69,8 @@ export default function LoginPage() {
         setError('Sign-in cancelled. Please try again.');
       } else if (error.code === 'auth/popup-blocked') {
         setError('Pop-up was blocked. Please allow pop-ups for this site.');
+      } else if (error.code === 'auth/operation-not-allowed') {
+        setError('Google Sign-In is not enabled. Please enable it in Firebase Console.');
       } else {
         setError(error.message || 'Failed to sign in with Google');
       }
@@ -122,12 +139,51 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
+        {/* Back to Home Button */}
+        <button
+          onClick={() => router.push('/')}
+          className="mb-4 flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Home</span>
+        </button>
+
         <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-4xl font-bold gradient-text mb-2">GrowPilot</h1>
           <p className="text-gray-400">{isSignUp ? 'Create your account' : 'Welcome back!'}</p>
         </div>
 
         <div className="glass p-8 rounded-2xl shadow-2xl animate-slide-in-up">
+          {/* Already Logged In Warning */}
+          {isMounted && firebaseUser && (
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+              <div className="flex items-start space-x-3">
+                <span className="text-2xl">👤</span>
+                <div className="flex-1">
+                  <p className="text-sm text-blue-300 font-semibold mb-2">
+                    You're already logged in as {firebaseUser.email}
+                  </p>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => router.push('/dashboard')}
+                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Go to Dashboard
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-2 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
+                    >
+                      Logout & Switch Account
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 mb-4 animate-shake">
               <p className="text-red-400 text-sm">{error}</p>
@@ -137,7 +193,7 @@ export default function LoginPage() {
           {/* Google Sign In Button */}
           <button
             onClick={handleGoogleSignIn}
-            disabled={isLoading || !auth}
+            disabled={isLoading || !!firebaseUser}
             className="w-full py-3 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-3 mb-6"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -171,7 +227,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-500"
                 placeholder="you@example.com"
-                disabled={isLoading}
+                disabled={isLoading || !!firebaseUser}
               />
             </div>
 
@@ -186,14 +242,14 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-500"
                 placeholder="••••••••"
-                disabled={isLoading}
+                disabled={isLoading || !!firebaseUser}
                 minLength={6}
               />
             </div>
 
             <button
               type="submit"
-              disabled={isLoading || !auth}
+              disabled={isLoading || !!firebaseUser}
               className="w-full py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
               {isLoading ? (
@@ -207,17 +263,19 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-              disabled={isLoading}
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-sm text-gray-400">
+              {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+            </p>
+            <Link
+              href={isSignUp ? "/login" : "/register"}
+              className="block text-sm text-purple-400 hover:text-purple-300 transition-colors font-semibold"
             >
-              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-            </button>
+              {isSignUp ? 'Sign in instead' : 'Create a free account'}
+            </Link>
           </div>
 
-          {!auth && (
+          {isMounted && !auth && (
             <div className="mt-6 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
               <p className="text-sm text-yellow-300 font-semibold mb-2">⚠️ Firebase Not Configured</p>
               <p className="text-xs text-gray-400">

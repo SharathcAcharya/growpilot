@@ -1,7 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useUserStore } from '@/store/userStore';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
 import { 
   HomeIcon, 
   MegaphoneIcon, 
@@ -9,7 +13,8 @@ import {
   ChartBarIcon,
   UserGroupIcon,
   Cog6ToothIcon,
-  SparklesIcon
+  SparklesIcon,
+  ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -24,11 +29,32 @@ const navigation = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { firebaseUser, logout } = useUserStore();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    
+    setIsLoggingOut(true);
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
+      logout();
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <div className="flex flex-col w-64 bg-gray-900 text-white">
       <div className="flex items-center justify-center h-16 bg-gray-800">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
           🚀 GrowPilot
         </h1>
       </div>
@@ -56,7 +82,16 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t border-gray-800 space-y-3">
+        {/* User Info */}
+        {firebaseUser && (
+          <div className="px-4 py-3 bg-gray-800 rounded-lg">
+            <p className="text-xs text-gray-400">Logged in as</p>
+            <p className="text-sm font-semibold text-white truncate">{firebaseUser.email}</p>
+          </div>
+        )}
+
+        {/* Plan Info */}
         <div className="px-4 py-3 bg-gray-800 rounded-lg">
           <p className="text-xs text-gray-400">Current Plan</p>
           <p className="text-sm font-semibold text-white">Free Tier</p>
@@ -67,6 +102,16 @@ export default function Sidebar() {
             Upgrade →
           </Link>
         </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+          {isLoggingOut ? 'Logging out...' : 'Logout'}
+        </button>
       </div>
     </div>
   );

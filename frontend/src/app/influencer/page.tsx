@@ -243,19 +243,19 @@ export default function InfluencerPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 mt-3 text-xs">
-                      <div key="relevance" className="flex justify-between">
+                      <div key={`${influencer._id}-relevance`} className="flex justify-between">
                         <span className="text-gray-600">Relevance:</span>
                         <span className="font-semibold">{influencer.aiScore.relevance}</span>
                       </div>
-                      <div key="authenticity" className="flex justify-between">
+                      <div key={`${influencer._id}-authenticity`} className="flex justify-between">
                         <span className="text-gray-600">Authenticity:</span>
                         <span className="font-semibold">{influencer.aiScore.authenticity}</span>
                       </div>
-                      <div key="reach" className="flex justify-between">
+                      <div key={`${influencer._id}-reach`} className="flex justify-between">
                         <span className="text-gray-600">Reach:</span>
                         <span className="font-semibold">{influencer.aiScore.reach}</span>
                       </div>
-                      <div key="engagement" className="flex justify-between">
+                      <div key={`${influencer._id}-engagement`} className="flex justify-between">
                         <span className="text-gray-600">Engagement:</span>
                         <span className="font-semibold">{influencer.aiScore.engagement}</span>
                       </div>

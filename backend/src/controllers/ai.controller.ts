@@ -19,10 +19,18 @@ export const chatCopilot = async (req: AuthRequest, res: Response) => {
       conversationHistory || []
     );
 
+    if (!response.success) {
+      return res.status(500).json({
+        success: false,
+        message: response.error || 'Failed to generate response',
+      });
+    }
+
     res.status(200).json({
       success: true,
       data: {
-        response,
+        response: response.reply,
+        tokensUsed: response.tokensUsed,
       },
     });
   } catch (error: any) {

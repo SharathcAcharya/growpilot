@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { auth } from '@/lib/firebase';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile, signOut } from 'firebase/auth';
 import { useUserStore } from '@/store/userStore';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { firebaseUser, setFirebaseUser } = useUserStore();
+  const { firebaseUser, setFirebaseUser, logout } = useUserStore();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,11 +20,19 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  useEffect(() => {
-    if (firebaseUser) {
-      router.push('/dashboard');
+  // Removed auto-redirect - let user choose to logout or go to dashboard
+
+  const handleLogout = async () => {
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
+      logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      setError('Failed to logout. Please try again.');
     }
-  }, [firebaseUser, router]);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -146,6 +154,45 @@ export default function RegisterPage() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
+        {/* Back to Home Button */}
+        <button
+          onClick={() => router.push('/')}
+          className="mb-4 flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Home</span>
+        </button>
+
+        {/* Already Logged In Warning */}
+        {firebaseUser && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">👤</span>
+              <div className="flex-1">
+                <p className="text-sm text-blue-300 font-semibold mb-2">
+                  You're already logged in as {firebaseUser.email}
+                </p>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => router.push('/dashboard')}
+                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Go to Dashboard
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
+                  >
+                    Logout & Create New Account
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Logo and Title */}
         <div className="text-center mb-8 animate-fade-in">
           <h1 className="text-4xl font-bold gradient-text mb-2">GrowPilot</h1>
@@ -169,7 +216,7 @@ export default function RegisterPage() {
                 required
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="John Doe"
-                disabled={isLoading}
+                disabled={isLoading || !!firebaseUser}
               />
             </div>
 
@@ -187,7 +234,7 @@ export default function RegisterPage() {
                 required
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="you@example.com"
-                disabled={isLoading}
+                disabled={isLoading || !!firebaseUser}
               />
             </div>
 
@@ -205,7 +252,7 @@ export default function RegisterPage() {
                 required
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
-                disabled={isLoading}
+                disabled={isLoading || !!firebaseUser}
               />
             </div>
 
@@ -223,7 +270,7 @@ export default function RegisterPage() {
                 required
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
-                disabled={isLoading}
+                disabled={isLoading || !!firebaseUser}
               />
             </div>
 
@@ -235,7 +282,7 @@ export default function RegisterPage() {
                 checked={acceptedTerms}
                 onChange={(e) => setAcceptedTerms(e.target.checked)}
                 className="mt-1 h-4 w-4 rounded border-white/10 bg-white/5 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
-                disabled={isLoading}
+                disabled={isLoading || !!firebaseUser}
               />
               <label htmlFor="terms" className="ml-3 text-sm text-gray-400">
                 I agree to the{' '}
@@ -259,7 +306,7 @@ export default function RegisterPage() {
             {/* Register Button */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || !!firebaseUser}
               className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isLoading ? (
@@ -286,7 +333,7 @@ export default function RegisterPage() {
           {/* Google Sign Up */}
           <button
             onClick={handleGoogleRegister}
-            disabled={isLoading}
+            disabled={isLoading || !!firebaseUser}
             className="w-full py-3 bg-white/5 border border-white/10 text-white font-semibold rounded-lg hover:bg-white/10 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">

@@ -86,46 +86,41 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
-      {/* Animated Background Mesh */}
-      <div className="fixed inset-0 gradient-bg opacity-50 pointer-events-none" />
-      
-      {/* Mouse Follow Gradient */}
-      <div 
-        className="fixed w-96 h-96 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl pointer-events-none transition-all duration-1000 ease-out"
-        style={{
-          left: mousePosition.x - 192,
-          top: mousePosition.y - 192,
-        }}
-      />
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/30 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-pink-500/30 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
 
       {/* Navigation */}
-      <nav className="relative z-10 glass border-b border-border/50 backdrop-blur-xl">
+      <nav className="relative z-10 backdrop-blur-md bg-white/5 border-b border-white/10">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 slide-in">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl pulse-glow">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl shadow-lg">
                 🚀
               </div>
-              <span className="text-2xl font-bold gradient-text">GrowPilot</span>
+              <span className="text-2xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">GrowPilot</span>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a>
-              <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-              <a href="#testimonials" className="text-muted-foreground hover:text-foreground transition-colors">Testimonials</a>
+              <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
+              <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
+              <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors">Testimonials</a>
             </div>
 
-            <div className="flex items-center space-x-4 fade-in">
+            <div className="flex items-center space-x-4">
               <button
                 onClick={() => router.push('/login')}
-                className="px-6 py-2.5 rounded-xl glass border border-white/10 text-white font-medium hover:bg-white/10 transition-all duration-200"
+                className="px-5 py-2.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium hover:bg-white/20 transition-all duration-200"
               >
                 Sign In
               </button>
               <button
                 onClick={() => router.push('/register')}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:shadow-lg hover:scale-105 transition-all duration-200"
+                className="px-5 py-2.5 rounded-xl bg-linear-to-r from-blue-600 to-purple-600 text-white font-medium hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-200"
               >
                 Get Started Free →
               </button>
@@ -137,55 +132,51 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative z-10 container mx-auto px-6 pt-20 pb-32">
         <div className="text-center max-w-5xl mx-auto">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass border border-border/50 mb-8 scale-in">
+          <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-8 animate-fade-in">
             <span className="text-2xl">✨</span>
-            <span className="text-sm font-medium text-muted-foreground">Powered by GPT-4 & Advanced AI</span>
+            <span className="text-sm font-medium text-blue-300">Powered by AI & DeepSeek</span>
           </div>
 
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight fade-in">
-            <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight animate-slide-in">
+            <span className="bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
               Marketing Automation
             </span>
             <br />
-            <span className="text-foreground">That Actually Works</span>
+            <span className="text-white">That Actually Works</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto fade-in">
+          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto animate-fade-in">
             Stop wasting time on repetitive marketing tasks. Let AI handle content creation, 
             campaigns, SEO, and influencer outreach while you focus on growth.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 scale-in">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-scale-in">
             <button
-              onClick={() => router.push('/login')}
-              className="px-8 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold hover:shadow-2xl hover:scale-105 transition-all duration-200 group shadow-lg shadow-purple-500/30"
+              onClick={() => router.push('/register')}
+              className="px-8 py-4 rounded-xl bg-linear-to-r from-blue-600 to-purple-600 text-white text-lg font-semibold hover:shadow-2xl hover:shadow-purple-500/50 hover:scale-105 transition-all duration-200 group"
             >
-              Try Demo Mode - No Setup
-              <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">🚀</span>
+              Start Free Trial
+              <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>
             </button>
             <button 
-              onClick={() => router.push('/register')}
-              className="px-8 py-4 rounded-xl border-2 border-white/20 glass backdrop-blur text-white text-lg font-semibold hover:border-purple-400 transition-all duration-200"
+              onClick={() => router.push('/login')}
+              className="px-8 py-4 rounded-xl border-2 border-white/20 bg-white/5 backdrop-blur text-white text-lg font-semibold hover:border-purple-400 hover:bg-white/10 transition-all duration-200"
             >
-              Create Account
+              Sign In
             </button>
           </div>
 
-          <p className="text-sm text-gray-400 mb-16 animate-fade-in">
-            ✨ Demo mode available - explore all features instantly, no signup required
-          </p>
-
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto fade-in">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in">
             {[
               { value: '10K+', label: 'Active Users' },
               { value: '1M+', label: 'Content Pieces' },
               { value: '500K+', label: 'Campaigns' },
               { value: '99.9%', label: 'Uptime' },
             ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-gradient-primary mb-2">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              <div key={i} className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+                <div className="text-3xl md:text-4xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">{stat.value}</div>
+                <div className="text-sm text-gray-400">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -195,32 +186,32 @@ export default function Home() {
       {/* Features Grid */}
       <section id="features" className="relative z-10 container mx-auto px-6 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">Everything You Need</h2>
-          <p className="text-xl text-muted-foreground">All your marketing tools in one intelligent platform</p>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Everything You Need</h2>
+          <p className="text-xl text-gray-300">All your marketing tools in one intelligent platform</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, i) => (
             <div
               key={i}
-              className={`p-8 rounded-2xl glass border border-border/50 hover:border-primary/50 transition-all duration-300 cursor-pointer group card-hover ${
-                activeFeature === i ? 'ring-2 ring-primary' : ''
+              className={`p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-purple-400/50 hover:bg-white/10 transition-all duration-300 cursor-pointer group ${
+                activeFeature === i ? 'ring-2 ring-purple-400' : ''
               }`}
               onMouseEnter={() => setActiveFeature(i)}
             >
-              <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`w-16 h-16 rounded-2xl bg-linear-to-br ${feature.gradient} flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                 {feature.icon}
               </div>
               
-              <h3 className="text-2xl font-bold mb-3 group-hover:text-gradient-primary transition-colors">
+              <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-purple-400 transition-colors">
                 {feature.title}
               </h3>
               
-              <p className="text-muted-foreground mb-4 leading-relaxed">
+              <p className="text-gray-400 mb-4 leading-relaxed">
                 {feature.description}
               </p>
               
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-sm font-medium">
                 <span>⚡</span>
                 <span>{feature.stats}</span>
               </div>
@@ -243,7 +234,7 @@ export default function Home() {
                 <div className="space-y-4">
                   {['Content Generation', 'Campaign Setup', 'Performance Analytics'].map((step, i) => (
                     <div key={i} className="flex items-center space-x-4 p-4 rounded-xl bg-background/50 border border-border/50">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">
+                      <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">
                         {i + 1}
                       </div>
                       <span className="font-medium">{step}</span>
@@ -253,7 +244,7 @@ export default function Home() {
               </div>
 
               <div className="relative">
-                <div className="aspect-video rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-border/50 backdrop-blur-xl">
+                <div className="aspect-video rounded-2xl bg-linear-to-br from-primary/20 to-secondary/20 flex items-center justify-center border border-border/50 backdrop-blur-xl">
                   <div className="text-6xl">▶️</div>
                 </div>
                 <div className="absolute -bottom-6 -right-6 px-6 py-3 rounded-xl bg-success text-white font-semibold shadow-xl">
@@ -286,7 +277,7 @@ export default function Home() {
               </p>
               
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl">
+                <div className="w-12 h-12 rounded-full bg-linear-to-br from-primary to-secondary flex items-center justify-center text-2xl">
                   {testimonial.image}
                 </div>
                 <div>
@@ -342,7 +333,7 @@ export default function Home() {
               }`}
             >
               {plan.popular && (
-                <div className="inline-block px-4 py-1 rounded-full bg-gradient-to-r from-primary to-secondary text-white text-sm font-medium mb-4">
+                <div className="inline-block px-4 py-1 rounded-full bg-linear-to-r from-primary to-secondary text-white text-sm font-medium mb-4">
                   ⭐ Most Popular
                 </div>
               )}
@@ -358,7 +349,7 @@ export default function Home() {
                 onClick={() => router.push('/dashboard')}
                 className={`w-full py-3 rounded-xl font-semibold mb-6 transition-all duration-200 ${
                   plan.popular
-                    ? 'bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:scale-105'
+                    ? 'bg-linear-to-r from-primary to-secondary text-white hover:shadow-lg hover:scale-105'
                     : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'
                 }`}
               >
@@ -380,7 +371,7 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="relative z-10 container mx-auto px-6 py-20">
-        <div className="max-w-4xl mx-auto text-center p-16 rounded-3xl bg-gradient-to-r from-primary to-secondary relative overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center p-16 rounded-3xl bg-linear-to-r from-primary to-secondary relative overflow-hidden">
           <div className="absolute inset-0 bg-black/20" />
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">

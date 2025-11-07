@@ -1,9 +1,16 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  organization: process.env.OPENAI_ORG_ID,
+// Initialize OpenRouter (compatible with OpenAI SDK)
+const openrouter = new OpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1',
+  defaultHeaders: {
+    'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'http://localhost:3000',
+    'X-Title': process.env.OPENROUTER_SITE_NAME || 'GrowPilot',
+  },
 });
+
+const AI_MODEL = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324';
 
 export interface GenerateAdCreativeRequest {
   brandName: string;
@@ -49,8 +56,8 @@ Generate:
 Format as JSON with keys: headlines, descriptions, ctas
 `;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+      const response = await openrouter.chat.completions.create({
+        model: AI_MODEL,
         messages: [
           {
             role: 'system',
@@ -85,7 +92,7 @@ Format as JSON with keys: headlines, descriptions, ctas
    */
   static async generateImage(prompt: string, size: '1024x1024' | '1792x1024' | '1024x1792' = '1024x1024') {
     try {
-      const response = await openai.images.generate({
+      const response = await openrouter.images.generate({
         model: 'dall-e-3',
         prompt: `Professional marketing advertisement: ${prompt}. High quality, modern design, eye-catching.`,
         n: 1,
@@ -118,6 +125,7 @@ Format as JSON with keys: headlines, descriptions, ctas
         long: '1000-1500 words',
       };
 
+      const systemMessage = 'You are an expert content writer specializing in marketing and SEO-optimized content.';
       const prompt = `
 Create ${params.type.replace('_', ' ')} content:
 
@@ -135,12 +143,12 @@ Requirements:
 ${params.type === 'blog' ? '- Include meta title and meta description for SEO' : ''}
 `;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+      const response = await openrouter.chat.completions.create({
+        model: AI_MODEL,
         messages: [
           {
             role: 'system',
-            content: 'You are an expert content writer specializing in marketing and SEO-optimized content.',
+            content: systemMessage,
           },
           {
             role: 'user',
@@ -150,12 +158,14 @@ ${params.type === 'blog' ? '- Include meta title and meta description for SEO' :
         temperature: 0.7,
       });
 
-      const content = response.choices[0]?.message?.content;
+      const content = response.choices[0]?.message?.content || '';
+      const tokensUsed = response.usage?.total_tokens || 0;
 
       return {
         success: true,
-        content: content || '',
-        tokensUsed: response.usage?.total_tokens || 0,
+        content: content,
+        tokensUsed: tokensUsed,
+        model: AI_MODEL,
       };
     } catch (error: any) {
       console.error('AI Content Generation Error:', error);
@@ -192,8 +202,8 @@ Provide:
 Format as JSON with keys: score, titleSuggestions, metaSuggestions, issues, quickWins, keywords
 `;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+      const response = await openrouter.chat.completions.create({
+        model: AI_MODEL,
         messages: [
           {
             role: 'system',
@@ -256,8 +266,8 @@ Also suggest collaboration approach and estimated value.
 Format as JSON with keys: relevance, authenticity, reach, engagement, overall, collaborationTips, estimatedValue
 `;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+      const response = await openrouter.chat.completions.create({
+        model: AI_MODEL,
         messages: [
           {
             role: 'system',
@@ -321,8 +331,8 @@ Provide:
 Format as JSON with keys: assessment, optimizations, budgetSuggestions, targetingChanges, creativeIdeas, predictedImpact
 `;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+      const response = await openrouter.chat.completions.create({
+        model: AI_MODEL,
         messages: [
           {
             role: 'system',
@@ -367,8 +377,8 @@ Format as JSON with keys: assessment, optimizations, budgetSuggestions, targetin
 Be concise, actionable, and friendly. Provide specific recommendations.
 ${context ? `\n\nUser Context:\n${JSON.stringify(context, null, 2)}` : ''}`;
 
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4o',
+      const response = await openrouter.chat.completions.create({
+        model: AI_MODEL,
         messages: [
           {
             role: 'system',

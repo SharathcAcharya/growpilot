@@ -97,8 +97,51 @@ export default function CreateCampaignPage() {
         return;
       }
 
+      // Transform frontend data to match backend schema
+      const campaignPayload = {
+        name: formData.name,
+        objective: formData.objective,
+        platform: formData.platforms.length > 1 ? 'multi' : formData.platforms[0],
+        brandId: 'default', // Use default brand for now
+        budget: {
+          total: formData.budget.total,
+          daily: formData.budget.daily,
+          currency: 'USD',
+          spent: 0,
+        },
+        schedule: {
+          startDate: new Date(formData.startDate),
+          endDate: formData.endDate ? new Date(formData.endDate) : undefined,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        targeting: {
+          age: {
+            min: formData.targeting.ageRange[0],
+            max: formData.targeting.ageRange[1],
+          },
+          gender: formData.targeting.gender,
+          locations: formData.targeting.locations,
+          interests: formData.targeting.interests,
+        },
+        status: 'draft',
+        creatives: [],
+        performance: {
+          impressions: 0,
+          clicks: 0,
+          conversions: 0,
+          ctr: 0,
+          cpc: 0,
+          cpm: 0,
+          roas: 0,
+        },
+        aiInsights: {
+          suggestions: [],
+          optimizationScore: 0,
+        },
+      };
+
       // Call API to create campaign
-      const response = await api.createCampaign(formData);
+      const response = await api.createCampaign(campaignPayload);
 
       if (response.data.success) {
         showNotification('🎉 Campaign created successfully!', 'success');

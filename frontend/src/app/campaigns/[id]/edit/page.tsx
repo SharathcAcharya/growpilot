@@ -95,14 +95,26 @@ export default function EditCampaignPage() {
       
       if (response.data.data) {
         const campaign = response.data.data;
+        
+        // Transform backend data to form data structure
+        const startDate = campaign.schedule?.startDate || campaign.startDate;
+        const endDate = campaign.schedule?.endDate || campaign.endDate;
+        
         setFormData({
           name: campaign.name,
           objective: campaign.objective,
-          platforms: campaign.platforms,
+          platforms: campaign.platform ? [campaign.platform] : [],
           budget: campaign.budget,
-          startDate: typeof campaign.startDate === 'string' ? campaign.startDate : new Date(campaign.startDate).toISOString().split('T')[0],
-          endDate: typeof campaign.endDate === 'string' ? campaign.endDate : new Date(campaign.endDate).toISOString().split('T')[0],
-          targeting: campaign.targeting,
+          startDate: typeof startDate === 'string' ? startDate : new Date(startDate).toISOString().split('T')[0],
+          endDate: typeof endDate === 'string' ? endDate : new Date(endDate).toISOString().split('T')[0],
+          targeting: {
+            ageRange: campaign.targeting.age 
+              ? [campaign.targeting.age.min, campaign.targeting.age.max]
+              : campaign.targeting.ageRange || [18, 65],
+            gender: campaign.targeting.gender || 'all',
+            locations: campaign.targeting.locations || ['United States'],
+            interests: campaign.targeting.interests || [],
+          },
           description: campaign.description,
           status: campaign.status,
         });
@@ -131,7 +143,35 @@ export default function EditCampaignPage() {
         return;
       }
 
-      await api.updateCampaign(campaignId, formData);
+      // Transform form data to match backend schema
+      const updatePayload = {
+        name: formData.name,
+        objective: formData.objective,
+        platform: formData.platforms.length > 1 ? 'multi' : formData.platforms[0],
+        budget: {
+          total: formData.budget.total,
+          daily: formData.budget.daily,
+          currency: 'USD',
+        },
+        schedule: {
+          startDate: new Date(formData.startDate),
+          endDate: formData.endDate ? new Date(formData.endDate) : undefined,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        targeting: {
+          age: {
+            min: formData.targeting.ageRange[0],
+            max: formData.targeting.ageRange[1],
+          },
+          gender: formData.targeting.gender,
+          locations: formData.targeting.locations,
+          interests: formData.targeting.interests,
+        },
+        description: formData.description,
+        status: formData.status,
+      };
+
+      await api.updateCampaign(campaignId, updatePayload);
       showNotification('✅ Campaign updated successfully!', 'success');
       setTimeout(() => {
         router.push(`/campaigns/${campaignId}`);

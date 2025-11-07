@@ -59,9 +59,10 @@ export default function ContentPage() {
         brandId: 'default',
         platform: 'website',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to generate content:', error);
-      alert('Failed to generate content. Please try again.');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to generate content. Please try again.';
+      alert(errorMessage);
     } finally {
       setGenerating(false);
     }

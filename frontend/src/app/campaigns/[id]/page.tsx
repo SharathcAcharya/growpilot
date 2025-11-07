@@ -29,17 +29,25 @@ interface Campaign {
   name: string;
   objective: string;
   status: 'active' | 'paused' | 'draft' | 'completed';
-  platforms: string[];
+  platform: string; // Single platform, not array
   budget: {
     total: number;
     spent: number;
     remaining?: number;
     daily?: number;
   };
-  startDate: Date;
-  endDate: Date;
+  schedule?: {
+    startDate: Date;
+    endDate?: Date;
+  };
+  startDate?: Date; // Fallback
+  endDate?: Date; // Fallback
   targeting: {
-    ageRange: [number, number];
+    age?: {
+      min: number;
+      max: number;
+    };
+    ageRange?: [number, number]; // Fallback
     gender?: string;
     locations?: string[];
     interests?: string[];
@@ -221,7 +229,7 @@ export default function CampaignDetailPage() {
                 {campaign.status.toUpperCase()}
               </span>
               <span className="text-gray-400 text-sm">
-                {campaign.platforms.map(p => platformIcons[p]).join(' ')} {campaign.platforms.join(', ')}
+                {platformIcons[campaign.platform] || '📱'} {campaign.platform}
               </span>
             </div>
           </div>
@@ -335,7 +343,7 @@ export default function CampaignDetailPage() {
             <div>
               <p className="text-sm text-gray-400">Campaign Duration</p>
               <p className="text-white">
-                {new Date(campaign.startDate).toLocaleDateString()} - {new Date(campaign.endDate).toLocaleDateString()}
+                {new Date(campaign.schedule?.startDate || campaign.startDate || Date.now()).toLocaleDateString()} - {new Date(campaign.schedule?.endDate || campaign.endDate || Date.now()).toLocaleDateString()}
               </p>
             </div>
 
@@ -355,7 +363,9 @@ export default function CampaignDetailPage() {
           <div className="space-y-4">
             <div>
               <p className="text-sm text-gray-400">Age Range</p>
-              <p className="text-white">{campaign.targeting.ageRange[0]} - {campaign.targeting.ageRange[1]} years</p>
+              <p className="text-white">
+                {campaign.targeting.age?.min || campaign.targeting.ageRange?.[0] || 18} - {campaign.targeting.age?.max || campaign.targeting.ageRange?.[1] || 65} years
+              </p>
             </div>
 
             <div>
