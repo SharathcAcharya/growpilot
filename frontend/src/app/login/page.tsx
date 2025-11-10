@@ -124,38 +124,39 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900 to-black flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 p-4 sm:p-6 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-0 right-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 left-1/3 w-64 h-64 sm:w-96 sm:h-96 bg-pink-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+
       {showToast && (
-        <Toast
-          message={toastMessage}
-          type="success"
-          onClose={() => setShowToast(false)}
+        <Toast 
+          message={toastMessage} 
+          onClose={() => setShowToast(false)} 
         />
       )}
 
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse-glow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }}></div>
-      </div>
-
-      <div className="w-full max-w-md relative z-10">
+      <div className="max-w-md w-full bg-white/5 backdrop-blur-lg rounded-2xl shadow-2xl p-6 sm:p-8 border border-white/10 relative z-10">
         {/* Back to Home Button */}
         <button
           onClick={() => router.push('/')}
-          className="mb-4 flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
+          className="mb-3 sm:mb-4 flex items-center space-x-2 text-sm sm:text-base text-gray-400 hover:text-white transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           <span>Back to Home</span>
         </button>
 
-        <div className="text-center mb-8 animate-fade-in">
-          <h1 className="text-4xl font-bold gradient-text mb-2">GrowPilot</h1>
-          <p className="text-gray-400">{isSignUp ? 'Create your account' : 'Welcome back!'}</p>
+        <div className="text-center mb-6 sm:mb-8 animate-fade-in">
+          <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">GrowPilot</h1>
+          <p className="text-sm sm:text-base text-gray-300">{isSignUp ? 'Create your account' : 'Welcome back!'}</p>
         </div>
 
-        <div className="glass p-8 rounded-2xl shadow-2xl animate-slide-in-up">
+        <div className="glass p-6 sm:p-8 rounded-2xl shadow-2xl animate-slide-in-up">
           {/* Already Logged In Warning */}
           {isMounted && firebaseUser && (
             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
@@ -186,7 +187,7 @@ export default function LoginPage() {
 
           {error && (
             <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 mb-4 animate-shake">
-              <p className="text-red-400 text-sm">{error}</p>
+              <p className="text-red-300 text-sm">{error}</p>
             </div>
           )}
 
@@ -194,7 +195,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={isLoading || !!firebaseUser}
-            className="w-full py-3 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-3 mb-6"
+            className="w-full py-3 bg-white/10 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/15 hover:border-purple-400/50 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-3 mb-6"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -207,17 +208,17 @@ export default function LoginPage() {
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600"></div>
+              <div className="w-full border-t border-white/20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-900/50 text-gray-400">Or continue with email</span>
+              <span className="px-2 bg-gray-900/80 text-gray-300">Or continue with email</span>
             </div>
           </div>
 
           {/* Email/Password Form */}
           <form onSubmit={handleEmailAuth} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
                 Email
               </label>
               <input
@@ -225,14 +226,14 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-500"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
                 placeholder="you@example.com"
                 disabled={isLoading || !!firebaseUser}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">
                 Password
               </label>
               <input
@@ -240,7 +241,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-500"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
                 placeholder="••••••••"
                 disabled={isLoading || !!firebaseUser}
                 minLength={6}
@@ -264,12 +265,12 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center space-y-2">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-300">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}
             </p>
             <Link
               href={isSignUp ? "/login" : "/register"}
-              className="block text-sm text-purple-400 hover:text-purple-300 transition-colors font-semibold"
+              className="block text-sm text-purple-300 hover:text-purple-200 transition-colors font-semibold"
             >
               {isSignUp ? 'Sign in instead' : 'Create a free account'}
             </Link>
@@ -277,21 +278,21 @@ export default function LoginPage() {
 
           {isMounted && !auth && (
             <div className="mt-6 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-              <p className="text-sm text-yellow-300 font-semibold mb-2">⚠️ Firebase Not Configured</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-sm text-yellow-200 font-semibold mb-2">⚠️ Firebase Not Configured</p>
+              <p className="text-xs text-gray-300">
                 Add your Firebase credentials to <code className="bg-gray-800 px-1 py-0.5 rounded">.env.local</code> to enable authentication.
               </p>
             </div>
           )}
         </div>
 
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <p className="text-center text-gray-400 text-sm mt-6">
           By signing in, you agree to our{' '}
-          <Link href="/terms" className="text-purple-400 hover:text-purple-300">
+          <Link href="/terms" className="text-purple-300 hover:text-purple-200 font-semibold">
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link href="/privacy" className="text-purple-400 hover:text-purple-300">
+          <Link href="/privacy" className="text-purple-300 hover:text-purple-200 font-semibold">
             Privacy Policy
           </Link>
         </p>
