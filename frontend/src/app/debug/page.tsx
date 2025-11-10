@@ -164,7 +164,7 @@ export default function DebugPage() {
           <h3 className="text-lg font-semibold text-yellow-400 mb-3">
             ⚠️ Troubleshooting Steps
           </h3>
-          <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
+          <ol className="list-decimal list-inside space-y-2 text-sm text-gray-200">
             <li>If "Has firebaseUser in localStorage" is ❌, click "Clear localStorage & Reload"</li>
             <li>After reload, go to /login and click "Start Demo Mode"</li>
             <li>Come back to this page to verify the state</li>

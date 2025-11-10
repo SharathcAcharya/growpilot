@@ -196,7 +196,7 @@ export default function RegisterPage() {
         {/* Logo and Title */}
         <div className="text-center mb-6 sm:mb-8 animate-fade-in">
           <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">GrowPilot</h1>
-          <p className="text-sm sm:text-base text-gray-300">Create your account and get started</p>
+          <p className="text-sm sm:text-base text-gray-200">Create your account and get started</p>
         </div>
 
         {/* Register Card */}
@@ -284,7 +284,7 @@ export default function RegisterPage() {
                 className="mt-1 h-4 w-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
                 disabled={isLoading || !!firebaseUser}
               />
-              <label htmlFor="terms" className="ml-3 text-sm text-gray-300">
+              <label htmlFor="terms" className="ml-3 text-sm text-gray-200">
                 I agree to the{' '}
                 <Link href="/terms" className="text-purple-300 hover:text-purple-200 font-semibold">
                   Terms of Service
@@ -326,7 +326,7 @@ export default function RegisterPage() {
               <div className="w-full border-t border-white/20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-gray-900/80 text-gray-300">Or sign up with</span>
+              <span className="px-4 bg-gray-900/80 text-gray-200">Or sign up with</span>
             </div>
           </div>
 
@@ -351,7 +351,7 @@ export default function RegisterPage() {
 
           {/* Sign In Link */}
           <div className="mt-6 text-center">
-            <p className="text-gray-300">
+            <p className="text-gray-200">
               Already have an account?{' '}
               <Link href="/login" className="text-purple-300 hover:text-purple-200 font-semibold transition-colors">
                 Sign in

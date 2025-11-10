@@ -153,7 +153,7 @@ export default function LoginPage() {
 
         <div className="text-center mb-6 sm:mb-8 animate-fade-in">
           <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">GrowPilot</h1>
-          <p className="text-sm sm:text-base text-gray-300">{isSignUp ? 'Create your account' : 'Welcome back!'}</p>
+          <p className="text-sm sm:text-base text-gray-200">{isSignUp ? 'Create your account' : 'Welcome back!'}</p>
         </div>
 
         <div className="glass p-6 sm:p-8 rounded-2xl shadow-2xl animate-slide-in-up">
@@ -211,7 +211,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-white/20"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-900/80 text-gray-300">Or continue with email</span>
+              <span className="px-2 bg-gray-900/80 text-gray-200">Or continue with email</span>
             </div>
           </div>
 
@@ -265,7 +265,7 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center space-y-2">
-            <p className="text-sm text-gray-300">
+            <p className="text-sm text-gray-200">
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}
             </p>
             <Link
@@ -279,7 +279,7 @@ export default function LoginPage() {
           {isMounted && !auth && (
             <div className="mt-6 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
               <p className="text-sm text-yellow-200 font-semibold mb-2">⚠️ Firebase Not Configured</p>
-              <p className="text-xs text-gray-300">
+              <p className="text-xs text-gray-200">
                 Add your Firebase credentials to <code className="bg-gray-800 px-1 py-0.5 rounded">.env.local</code> to enable authentication.
               </p>
             </div>

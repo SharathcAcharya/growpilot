@@ -142,6 +142,18 @@
   100% { transform: rotate(0deg); }
 }
 
+@keyframes blob {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(20px, -50px) scale(1.1); }
+  50% { transform: translate(-20px, 20px) scale(0.9); }
+  75% { transform: translate(50px, 50px) scale(1.05); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 /* ANIMATION CLASSES */
 .animate-fade-in { animation: fade-in 0.5s ease-out; }
 .animate-slide-in-up { animation: slide-in-up 0.6s ease-out; }
@@ -150,6 +162,7 @@
 .animate-slide-in-right { animation: slide-in-right 0.6s ease-out; }
 .animate-scale-in { animation: scale-in 0.5s ease-out; }
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 .animate-gradient { animation: gradient-shift 8s ease infinite; background-size: 200% 200%; }
 .animate-spin { animation: spin 1s linear infinite; }
@@ -163,6 +176,11 @@
 .animate-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
 .animate-blink { animation: blink 1.5s ease-in-out infinite; }
 .animate-wave { animation: wave 2s ease-in-out; }
+.animate-blob { animation: blob 7s ease-in-out infinite; }
+
+/* Animation Delays */
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
 
 /* GLASS MORPHISM */
 .glass {

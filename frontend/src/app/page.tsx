@@ -106,9 +106,9 @@ export default function Home() {
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
-              <a href="#pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</a>
-              <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors">Testimonials</a>
+              <a href="#features" className="text-gray-200 hover:text-white transition-colors">Features</a>
+              <a href="#pricing" className="text-gray-200 hover:text-white transition-colors">Pricing</a>
+              <a href="#testimonials" className="text-gray-200 hover:text-white transition-colors">Testimonials</a>
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -146,7 +146,7 @@ export default function Home() {
             <span className="text-white">That Actually Works</span>
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-12 max-w-3xl mx-auto animate-fade-in px-4">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 mb-8 sm:mb-12 max-w-3xl mx-auto animate-fade-in px-4">
             Stop wasting time on repetitive marketing tasks. Let AI handle content creation, 
             campaigns, SEO, and influencer outreach while you focus on growth.
           </p>
@@ -188,7 +188,7 @@ export default function Home() {
       <section id="features" className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent px-4">Everything You Need</h2>
-          <p className="text-base sm:text-lg md:text-xl text-gray-300 px-4">All your marketing tools in one intelligent platform</p>
+          <p className="text-base sm:text-lg md:text-xl text-gray-200 px-4">All your marketing tools in one intelligent platform</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -229,7 +229,7 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 items-center">
               <div>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">See It In Action</h2>
-                <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8">
+                <p className="text-base sm:text-lg md:text-xl text-gray-200 mb-6 sm:mb-8">
                   Watch how GrowPilot can generate a complete marketing campaign in under 60 seconds.
                 </p>
                 
@@ -262,7 +262,7 @@ export default function Home() {
       <section id="testimonials" className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent px-4">Loved by Marketers</h2>
-          <p className="text-base sm:text-lg md:text-xl text-gray-300 px-4">Join thousands of teams growing faster with GrowPilot</p>
+          <p className="text-base sm:text-lg md:text-xl text-gray-200 px-4">Join thousands of teams growing faster with GrowPilot</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
@@ -274,7 +274,7 @@ export default function Home() {
                 ))}
               </div>
               
-              <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6 leading-relaxed italic">
+              <p className="text-sm sm:text-base text-gray-200 mb-4 sm:mb-6 leading-relaxed italic">
                 "{testimonial.quote}"
               </p>
               
@@ -296,7 +296,7 @@ export default function Home() {
       <section id="pricing" className="relative z-10 container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent px-4">Simple Pricing</h2>
-          <p className="text-base sm:text-lg md:text-xl text-gray-300 px-4">Start free, scale as you grow</p>
+          <p className="text-base sm:text-lg md:text-xl text-gray-200 px-4">Start free, scale as you grow</p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
@@ -345,7 +345,7 @@ export default function Home() {
                 <span className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{plan.price}</span>
                 {plan.price !== 'Free' && <span className="text-gray-400 text-sm sm:text-base">/month</span>}
               </div>
-              <p className="text-sm sm:text-base text-gray-300 mb-5 sm:mb-6">{plan.description}</p>
+              <p className="text-sm sm:text-base text-gray-200 mb-5 sm:mb-6">{plan.description}</p>
               
               <button
                 onClick={() => router.push('/register')}
@@ -362,7 +362,7 @@ export default function Home() {
                 {plan.features.map((feature, j) => (
                   <div key={j} className="flex items-start space-x-2 sm:space-x-3">
                     <span className="text-green-400 text-sm sm:text-base mt-0.5">✓</span>
-                    <span className="text-xs sm:text-sm text-gray-300 leading-relaxed">{feature}</span>
+                    <span className="text-xs sm:text-sm text-gray-200 leading-relaxed">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -404,7 +404,7 @@ export default function Home() {
                 </div>
                 <span className="text-lg sm:text-xl font-bold bg-linear-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">GrowPilot</span>
               </div>
-              <p className="text-gray-300 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4">
+              <p className="text-gray-200 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4">
                 AI-powered marketing automation for modern businesses. Grow faster with intelligent campaigns.
               </p>
               <div className="flex items-center space-x-3 sm:space-x-4">

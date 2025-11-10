@@ -191,7 +191,7 @@ export default function CreateCampaignPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Campaign Name *</label>
+        <label className="block text-sm font-medium text-gray-200 mb-2">Campaign Name *</label>
         <input
           type="text"
           value={formData.name}
@@ -202,7 +202,7 @@ export default function CreateCampaignPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-3">Campaign Objective *</label>
+        <label className="block text-sm font-medium text-gray-200 mb-3">Campaign Objective *</label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {objectives.map((obj) => (
             <button
@@ -227,7 +227,7 @@ export default function CreateCampaignPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Description (Optional)</label>
+        <label className="block text-sm font-medium text-gray-200 mb-2">Description (Optional)</label>
         <textarea
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -287,7 +287,7 @@ export default function CreateCampaignPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Total Budget ($) *</label>
+          <label className="block text-sm font-medium text-gray-200 mb-2">Total Budget ($) *</label>
           <div className="relative">
             <CurrencyDollarIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
@@ -304,7 +304,7 @@ export default function CreateCampaignPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Daily Budget ($)</label>
+          <label className="block text-sm font-medium text-gray-200 mb-2">Daily Budget ($)</label>
           <div className="relative">
             <CurrencyDollarIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
@@ -324,7 +324,7 @@ export default function CreateCampaignPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Start Date *</label>
+          <label className="block text-sm font-medium text-gray-200 mb-2">Start Date *</label>
           <div className="relative">
             <CalendarIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
@@ -337,7 +337,7 @@ export default function CreateCampaignPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">End Date *</label>
+          <label className="block text-sm font-medium text-gray-200 mb-2">End Date *</label>
           <div className="relative">
             <CalendarIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
@@ -373,7 +373,7 @@ export default function CreateCampaignPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-3">Age Range</label>
+        <label className="block text-sm font-medium text-gray-200 mb-3">Age Range</label>
         <div className="flex items-center space-x-4">
           <input
             type="number"
@@ -409,7 +409,7 @@ export default function CreateCampaignPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-3">Gender</label>
+        <label className="block text-sm font-medium text-gray-200 mb-3">Gender</label>
         <div className="flex space-x-4">
           {['all', 'male', 'female'].map((gender) => (
             <button
@@ -431,7 +431,7 @@ export default function CreateCampaignPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-3">
+        <label className="block text-sm font-medium text-gray-200 mb-3">
           Interests (Select up to 5)
         </label>
         <div className="flex flex-wrap gap-2">

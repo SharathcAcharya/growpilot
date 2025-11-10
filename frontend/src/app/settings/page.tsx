@@ -116,7 +116,7 @@ export default function SettingsPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Display Name</label>
+                      <label className="block text-sm font-medium text-gray-200 mb-2">Display Name</label>
                       <input
                         type="text"
                         defaultValue={firebaseUser?.displayName || 'Demo User'}
@@ -124,7 +124,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                      <label className="block text-sm font-medium text-gray-200 mb-2">Email</label>
                       <input
                         type="email"
                         defaultValue={firebaseUser?.email || 'demo@growpilot.com'}
@@ -135,7 +135,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">Bio</label>
                     <textarea
                       placeholder="Tell us about yourself..."
                       rows={4}
