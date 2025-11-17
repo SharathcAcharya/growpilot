@@ -49,12 +49,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         }
       } else {
         setUserProfile(null);
-        console.log('⚠️ No authenticated user - redirecting to login');
         
-        // Redirect to login if on protected route
+        // Only redirect if on protected route
         const protectedRoutes = ['/dashboard', '/campaigns', '/content', '/seo', '/influencer', '/copilot', '/settings'];
-        if (protectedRoutes.some(route => window.location.pathname.startsWith(route))) {
+        const isProtectedRoute = protectedRoutes.some(route => window.location.pathname.startsWith(route));
+        
+        if (isProtectedRoute) {
+          console.log('⚠️ No authenticated user on protected route - redirecting to login');
           router.push('/login');
+        } else {
+          console.log('ℹ️ No authenticated user (on public page)');
         }
       }
       

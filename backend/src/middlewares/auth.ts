@@ -5,6 +5,10 @@ export interface AuthRequest extends Request {
   user?: {
     uid: string;
     email?: string;
+    name?: string;
+    displayName?: string;
+    picture?: string;
+    photoURL?: string;
   };
 }
 
@@ -43,8 +47,12 @@ export const authenticate = async (
       req.user = {
         uid: decodedToken.uid,
         email: decodedToken.email,
+        name: decodedToken.name,
+        displayName: decodedToken.name,
+        picture: decodedToken.picture,
+        photoURL: decodedToken.picture,
       };
-      console.log('✅ User authenticated:', req.user.email);
+      console.log('✅ User authenticated:', req.user.email, `(${req.user.displayName || 'no name'})`);
       next();
     } catch (error: any) {
       console.error('Token verification error:', error);

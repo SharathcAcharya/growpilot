@@ -26,8 +26,23 @@ export class SEOService {
    */
   static async auditWebsite(url: string): Promise<SEOAuditResult> {
     try {
+      // Validate URL format
+      try {
+        const parsedUrl = new URL(url);
+        if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+          throw new Error('URL must use HTTP or HTTPS protocol');
+        }
+      } catch (e: any) {
+        throw new Error('Invalid URL format. Please provide a complete URL including http:// or https://');
+      }
+
       // Fetch page content
       const { html, loadTime } = await this.fetchPageContent(url);
+      
+      if (!html || html.trim().length === 0) {
+        throw new Error('Received empty response from the website. The page may not exist or is not accessible.');
+      }
+      
       const $ = cheerio.load(html);
 
       // Technical SEO Analysis
@@ -63,14 +78,21 @@ export class SEOService {
         performance
       );
 
-      // Get AI insights
-      const pageText = $('body').text().substring(0, 3000);
-      const aiAnalysis = await AIService.analyzeSEO(
-        url,
-        pageText,
-        $('title').text(),
-        $('meta[name="description"]').attr('content')
-      );
+      // Get AI insights (optional - don't fail if AI is unavailable)
+      let aiInsights = {};
+      try {
+        const pageText = $('body').text().substring(0, 3000);
+        const aiAnalysis = await AIService.analyzeSEO(
+          url,
+          pageText,
+          $('title').text(),
+          $('meta[name="description"]').attr('content')
+        );
+        aiInsights = aiAnalysis.success ? aiAnalysis.data : {};
+      } catch (aiError: any) {
+        console.warn('AI insights not available:', aiError.message);
+        // Continue without AI insights
+      }
 
       const result: SEOAuditResult = {
         url,
@@ -90,7 +112,7 @@ export class SEOService {
         contentAnalysis,
         keywords: this.extractKeywords($),
         recommendations,
-        aiInsights: aiAnalysis.success ? aiAnalysis.data : {},
+        aiInsights,
       };
 
       return result;
@@ -109,8 +131,19 @@ export class SEOService {
       const response = await axios.get(url, {
         timeout: 30000,
         headers: {
-          'User-Agent': 'GrowPilot-SEO-Bot/1.0',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Connection': 'keep-alive',
+          'Upgrade-Insecure-Requests': '1',
+          'Sec-Fetch-Dest': 'document',
+          'Sec-Fetch-Mode': 'navigate',
+          'Sec-Fetch-Site': 'none',
+          'Cache-Control': 'max-age=0',
         },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400, // Accept any status code less than 400
       });
       const loadTime = Date.now() - startTime;
       return {
@@ -118,7 +151,31 @@ export class SEOService {
         loadTime,
       };
     } catch (error: any) {
-      throw new Error(`Failed to fetch page: ${error.message}`);
+      // Provide user-friendly error messages
+      if (error.response) {
+        const status = error.response.status;
+        if (status === 403) {
+          throw new Error('Website blocked the audit request. This website may have anti-bot protection. Try a different URL or ensure the website is publicly accessible.');
+        } else if (status === 404) {
+          throw new Error('Page not found (404). Please check the URL and try again.');
+        } else if (status === 401) {
+          throw new Error('Unauthorized (401). This page requires authentication.');
+        } else if (status === 503) {
+          throw new Error('Service unavailable (503). The website may be down or experiencing issues.');
+        } else if (status >= 500) {
+          throw new Error(`Server error (${status}). The website is experiencing technical difficulties.`);
+        } else {
+          throw new Error(`Failed to access website (HTTP ${status}). Please try again.`);
+        }
+      } else if (error.code === 'ENOTFOUND') {
+        throw new Error('Website not found. Please check the URL and ensure it includes http:// or https://');
+      } else if (error.code === 'ETIMEDOUT' || error.code === 'ECONNABORTED') {
+        throw new Error('Connection timeout. The website is taking too long to respond.');
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error('Connection refused. The website may be down or blocking requests.');
+      } else {
+        throw new Error(`Failed to fetch page: ${error.message}`);
+      }
     }
   }
 

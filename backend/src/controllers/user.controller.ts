@@ -14,12 +14,17 @@ export const getCurrentUser = async (req: AuthRequest, res: Response): Promise<v
 
     // Create user if doesn't exist
     if (!user) {
+      console.log(`Creating new user in database for: ${req.user?.email}`);
+      
       user = new User({
         uid: userId,
         email: req.user?.email || '',
-        displayName: req.user?.email?.split('@')[0] || 'User',
+        displayName: req.user?.name || req.user?.displayName || req.user?.email?.split('@')[0] || 'User',
+        photoURL: req.user?.picture || req.user?.photoURL,
       });
+      
       await user.save();
+      console.log(`✅ User created in database: ${user.email} (${user.displayName})`);
     }
 
     // Update last login

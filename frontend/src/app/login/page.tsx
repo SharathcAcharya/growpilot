@@ -21,6 +21,36 @@ export default function LoginPage() {
   // Email/Password form
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  // Validation helpers
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password: string): boolean => {
+    return password.length >= 6;
+  };
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setEmailError('');
+    setError('');
+    if (value && !validateEmail(value)) {
+      setEmailError('Please enter a valid email address');
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setPasswordError('');
+    setError('');
+    if (isSignUp && value && !validatePassword(value)) {
+      setPasswordError('Password must be at least 6 characters');
+    }
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -86,38 +116,85 @@ export default function LoginPage() {
       return;
     }
 
-    if (!email || !password) {
-      setError('Please enter both email and password');
+    // Clear previous errors
+    setError('');
+    setEmailError('');
+    setPasswordError('');
+
+    // Validate fields
+    let hasError = false;
+
+    if (!email.trim()) {
+      setEmailError('Email is required');
+      hasError = true;
+    } else if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      hasError = true;
+    }
+
+    if (!password) {
+      setPasswordError('Password is required');
+      hasError = true;
+    } else if (isSignUp && !validatePassword(password)) {
+      setPasswordError('Password must be at least 6 characters');
+      hasError = true;
+    }
+
+    if (hasError) {
       return;
     }
 
-    setError('');
     setIsLoading(true);
 
     try {
+      let userCredential;
+      
       if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
-        setToastMessage('✅ Account created successfully!');
+        // Create account
+        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        console.log('✅ Firebase account created:', userCredential.user.email);
+        
+        // Wait for AuthProvider to sync with backend
+        setToastMessage('✅ Account created successfully! Redirecting...');
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
-        setToastMessage(`✅ Welcome back!`);
+        // Sign in
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('✅ Signed in:', userCredential.user.email);
+        
+        // Wait for AuthProvider to sync with backend
+        setToastMessage('✅ Welcome back! Redirecting...');
       }
+      
       setShowToast(true);
+      
+      // AuthProvider will handle backend sync and redirection
+      // No manual redirect needed here
     } catch (error: any) {
       console.error('Email Auth Error:', error);
       
+      // Handle Firebase auth errors with user-friendly messages
       if (error.code === 'auth/email-already-in-use') {
-        setError('Email already in use. Try signing in instead.');
+        setError('This email is already registered. Please sign in instead or use "Forgot Password".');
       } else if (error.code === 'auth/weak-password') {
-        setError('Password should be at least 6 characters');
+        setPasswordError('Password should be at least 6 characters');
       } else if (error.code === 'auth/user-not-found') {
-        setError('No account found with this email. Try signing up.');
+        setEmailError('No account found with this email');
+        setError('No account exists with this email. Please sign up first.');
       } else if (error.code === 'auth/wrong-password') {
-        setError('Incorrect password. Please try again.');
+        setPasswordError('Incorrect password');
+        setError('Incorrect password. Please try again or use "Forgot Password".');
       } else if (error.code === 'auth/invalid-email') {
-        setError('Invalid email address');
+        setEmailError('Invalid email format');
+        setError('Please enter a valid email address.');
+      } else if (error.code === 'auth/invalid-credential') {
+        // This covers both wrong password and non-existent email
+        setError('Invalid email or password. Please check your credentials and try again.');
+      } else if (error.code === 'auth/too-many-requests') {
+        setError('Too many failed attempts. Please try again later or reset your password.');
+      } else if (error.code === 'auth/network-request-failed') {
+        setError('Network error. Please check your internet connection.');
       } else {
-        setError(error.message || 'Authentication failed');
+        setError(error.message || 'Authentication failed. Please try again.');
       }
       setIsLoading(false);
     }
@@ -225,11 +302,18 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
+                onChange={(e) => handleEmailChange(e.target.value)}
+                className={`w-full px-4 py-3 bg-white/10 border rounded-lg focus:ring-2 text-white placeholder-gray-400 transition-all ${
+                  emailError ? 'border-red-500 focus:ring-red-500' : 'border-white/20 focus:ring-purple-500 focus:border-transparent'
+                }`}
                 placeholder="you@example.com"
                 disabled={isLoading || !!firebaseUser}
               />
+              {emailError && (
+                <p className="mt-1 text-xs sm:text-sm text-red-400 flex items-center gap-1">
+                  <span>⚠️</span> {emailError}
+                </p>
+              )}
             </div>
 
             <div>
@@ -240,12 +324,19 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-400"
+                onChange={(e) => handlePasswordChange(e.target.value)}
+                className={`w-full px-4 py-3 bg-white/10 border rounded-lg focus:ring-2 text-white placeholder-gray-400 transition-all ${
+                  passwordError ? 'border-red-500 focus:ring-red-500' : 'border-white/20 focus:ring-purple-500 focus:border-transparent'
+                }`}
                 placeholder="••••••••"
                 disabled={isLoading || !!firebaseUser}
                 minLength={6}
               />
+              {passwordError && (
+                <p className="mt-1 text-xs sm:text-sm text-red-400 flex items-center gap-1">
+                  <span>⚠️</span> {passwordError}
+                </p>
+              )}
             </div>
 
             <button

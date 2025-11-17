@@ -19,6 +19,42 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+
+  // Validation helpers
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password: string): { valid: boolean; message: string } => {
+    if (password.length < 6) {
+      return { valid: false, message: 'Password must be at least 6 characters' };
+    }
+    if (!/[A-Za-z]/.test(password)) {
+      return { valid: false, message: 'Password must contain at least one letter' };
+    }
+    if (!/[0-9]/.test(password)) {
+      return { valid: false, message: 'Password must contain at least one number' };
+    }
+    return { valid: true, message: '' };
+  };
+
+  const validateName = (name: string): boolean => {
+    const trimmedName = name.trim();
+    // Check length
+    if (trimmedName.length < 2) {
+      return false;
+    }
+    // Check if name contains only letters and spaces (no numbers or special characters)
+    const nameRegex = /^[a-zA-Z\s]+$/;
+    return nameRegex.test(trimmedName);
+  };
 
   // Removed auto-redirect - let user choose to logout or go to dashboard
 
@@ -35,34 +71,102 @@ export default function RegisterPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: value
     }));
+
+    // Clear errors
+    setError('');
+    setFieldErrors(prev => ({ ...prev, [name]: '' }));
+
+    // Real-time validation
+    if (name === 'name' && value) {
+      if (!validateName(value)) {
+        if (value.trim().length < 2) {
+          setFieldErrors(prev => ({ ...prev, name: 'Name must be at least 2 characters' }));
+        } else if (!/^[a-zA-Z\s]+$/.test(value)) {
+          setFieldErrors(prev => ({ ...prev, name: 'Name can only contain letters and spaces' }));
+        }
+      }
+    }
+
+    if (name === 'email' && value) {
+      if (!validateEmail(value)) {
+        setFieldErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+      }
+    }
+
+    if (name === 'password' && value) {
+      const validation = validatePassword(value);
+      if (!validation.valid) {
+        setFieldErrors(prev => ({ ...prev, password: validation.message }));
+      }
+    }
+
+    if (name === 'confirmPassword' && value) {
+      if (value !== formData.password) {
+        setFieldErrors(prev => ({ ...prev, confirmPassword: 'Passwords do not match' }));
+      }
+    }
   };
 
   const validateForm = () => {
+    const errors = { name: '', email: '', password: '', confirmPassword: '' };
+    let isValid = true;
+
+    // Name validation
     if (!formData.name.trim()) {
-      setError('Please enter your name');
-      return false;
+      errors.name = 'Name is required';
+      isValid = false;
+    } else if (!validateName(formData.name)) {
+      if (formData.name.trim().length < 2) {
+        errors.name = 'Name must be at least 2 characters';
+      } else {
+        errors.name = 'Name can only contain letters and spaces';
+      }
+      isValid = false;
     }
+
+    // Email validation
     if (!formData.email.trim()) {
-      setError('Please enter your email');
-      return false;
+      errors.email = 'Email is required';
+      isValid = false;
+    } else if (!validateEmail(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+      isValid = false;
     }
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
+
+    // Password validation
+    if (!formData.password) {
+      errors.password = 'Password is required';
+      isValid = false;
+    } else {
+      const validation = validatePassword(formData.password);
+      if (!validation.valid) {
+        errors.password = validation.message;
+        isValid = false;
+      }
     }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
+
+    // Confirm password validation
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your password';
+      isValid = false;
+    } else if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+      isValid = false;
     }
+
+    // Terms validation
     if (!acceptedTerms) {
-      setError('Please accept the terms and conditions');
-      return false;
+      setError('⚠️ Please accept the terms and conditions to continue');
+      isValid = false;
     }
-    return true;
+
+    setFieldErrors(errors);
+    return isValid;
   };
 
   const handleEmailRegister = async (e: React.FormEvent) => {
@@ -79,23 +183,56 @@ export default function RegisterPage() {
         return;
       }
 
+      // Create Firebase account
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
         formData.password
       );
 
-      // Update display name
+      console.log('✅ Firebase account created:', userCredential.user.email);
+
+      // Update display name in Firebase
       await updateProfile(userCredential.user, {
         displayName: formData.name
       });
 
+      console.log('✅ Display name updated:', formData.name);
+
+      // Update local state
       setFirebaseUser(userCredential.user);
-      router.push('/dashboard');
+
+      // AuthProvider will automatically:
+      // 1. Detect the auth state change
+      // 2. Create/fetch user profile from backend
+      // 3. Redirect to dashboard
+      console.log('⏳ Waiting for AuthProvider to sync with backend...');
+      
+      // Show success message
+      setError('');
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      });
     } catch (err: any) {
-      console.error('Registration error:', err);
+      console.error('❌ Registration error:', err);
+      
+      // Handle Firebase errors with specific messages
       if (err.code === 'auth/email-already-in-use') {
-        setError('This email is already registered. Please sign in instead.');
+        setFieldErrors(prev => ({ ...prev, email: 'Email already registered' }));
+        setError('This email is already registered. Please sign in instead or use a different email.');
+      } else if (err.code === 'auth/weak-password') {
+        setFieldErrors(prev => ({ ...prev, password: 'Password is too weak' }));
+        setError('Please use a stronger password (at least 6 characters with letters and numbers).');
+      } else if (err.code === 'auth/invalid-email') {
+        setFieldErrors(prev => ({ ...prev, email: 'Invalid email format' }));
+        setError('Please enter a valid email address.');
+      } else if (err.code === 'auth/operation-not-allowed') {
+        setError('Email/password authentication is not enabled. Please contact support.');
+      } else if (err.code === 'auth/network-request-failed') {
+        setError('Network error. Please check your internet connection and try again.');
       } else {
         setError(err.message || 'Failed to create account. Please try again.');
       }
@@ -122,9 +259,17 @@ export default function RegisterPage() {
       }
 
       const provider = new GoogleAuthProvider();
+      provider.addScope('profile');
+      provider.addScope('email');
+      
       const userCredential = await signInWithPopup(auth, provider);
+      console.log('✅ Google sign-up successful:', userCredential.user.email);
+      
+      // Update local state
       setFirebaseUser(userCredential.user);
-      router.push('/dashboard');
+      
+      // AuthProvider will handle backend sync and redirection
+      console.log('⏳ Waiting for AuthProvider to sync with backend...');
     } catch (err: any) {
       console.error('Google registration error:', err);
       
@@ -146,7 +291,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-black flex items-center justify-center p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900 to-black flex items-center justify-center p-3 sm:p-4 md:p-6">
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse-glow"></div>
@@ -214,10 +359,17 @@ export default function RegisterPage() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
+                  fieldErrors.name ? 'border-red-500 focus:ring-red-500' : 'border-white/20 focus:ring-purple-500 focus:border-transparent'
+                }`}
                 placeholder="John Doe"
                 disabled={isLoading || !!firebaseUser}
               />
+              {fieldErrors.name && (
+                <p className="mt-1 text-xs sm:text-sm text-red-400 flex items-center gap-1">
+                  <span>⚠️</span> {fieldErrors.name}
+                </p>
+              )}
             </div>
 
             {/* Email Input */}
@@ -232,10 +384,17 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                placeholder="you@example.com"
+                className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-all ${
+                  fieldErrors.email ? 'border-red-500 focus:ring-red-500' : 'border-white/20 focus:ring-purple-500 focus:border-transparent'
+                }`}
+                placeholder="john@example.com"
                 disabled={isLoading || !!firebaseUser}
               />
+              {fieldErrors.email && (
+                <p className="mt-1 text-xs sm:text-sm text-red-400 flex items-center gap-1">
+                  <span>⚠️</span> {fieldErrors.email}
+                </p>
+              )}
             </div>
 
             {/* Password Input */}
@@ -307,7 +466,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading || !!firebaseUser}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
