@@ -56,7 +56,12 @@ export default function LoginPage() {
     setIsMounted(true);
   }, []);
 
-  // Removed auto-redirect - let user choose to logout or go to dashboard
+  // Auto-logout when visiting login page for security
+  useEffect(() => {
+    if (isMounted && firebaseUser) {
+      handleLogout();
+    }
+  }, [isMounted]); // Only run once when mounted
 
   const handleLogout = async () => {
     try {
@@ -234,34 +239,6 @@ export default function LoginPage() {
         </div>
 
         <div className="glass p-6 sm:p-8 rounded-2xl shadow-2xl animate-slide-in-up">
-          {/* Already Logged In Warning */}
-          {isMounted && firebaseUser && (
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
-              <div className="flex items-start space-x-3">
-                <span className="text-2xl">👤</span>
-                <div className="flex-1">
-                  <p className="text-sm text-blue-300 font-semibold mb-2">
-                    You're already logged in as {firebaseUser.email}
-                  </p>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => router.push('/dashboard')}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Go to Dashboard
-                    </button>
-                    <button
-                      onClick={handleLogout}
-                      className="px-4 py-2 bg-gray-700 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors"
-                    >
-                      Logout & Switch Account
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {error && (
             <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 mb-4 animate-shake">
               <p className="text-red-300 text-sm">{error}</p>

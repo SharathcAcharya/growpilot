@@ -105,9 +105,9 @@ function CustomSelect<T extends string | number>({
           ref={listRef}
           role="listbox"
           tabIndex={-1}
-          className="absolute left-0 right-0 mt-2 max-h-56 overflow-auto rounded-lg border border-white/10 bg-[rgba(8,6,12,0.92)] shadow-2xl z-[9999]"
+          className="absolute left-0 right-0 mt-2 max-h-56 overflow-auto rounded-lg border border-purple-500/50 shadow-2xl z-9999"
           style={{
-            // ensure crisp rendering (no blur) and strong contrast
+            backgroundColor: '#1a1625',
             backdropFilter: 'none',
             WebkitBackdropFilter: 'none',
           }}
@@ -118,7 +118,7 @@ function CustomSelect<T extends string | number>({
               role="option"
               aria-selected={opt.value === value}
               onMouseDown={(e) => { e.preventDefault(); handleSelect(opt.value); }}
-              className={`px-4 py-3 cursor-pointer flex items-center gap-3 hover:bg-white/6 transition-colors ${opt.value === value ? 'bg-white/8' : ''}`}
+              className={`px-4 py-3 cursor-pointer flex items-center gap-3 transition-colors ${opt.value === value ? 'bg-purple-600/40 text-purple-200' : 'text-gray-100 hover:bg-purple-600/20'}`}
             >
               <span className="emoji-lg">{opt.emoji ?? ''}</span>
               <span className="truncate">{opt.label}</span>
@@ -146,16 +146,36 @@ export default function InfluencerPage() {
     minFollowers: 10000,
     maxFollowers: 1000000,
     minEngagement: 2,
+    username: '',
   });
 
   const handleSearch = async () => {
     try {
       setSearching(true);
+      setInfluencers([]); // Clear previous results
+      
+      console.log('🔍 Searching for real influencers...', searchParams);
       const response = await api.searchInfluencers(searchParams);
-      setInfluencers(response.data.data || []);
-    } catch (error) {
+      
+      console.log('📦 Full API Response:', response);
+      console.log('📦 Response.data:', response.data);
+      console.log('📦 Response.data.data:', response.data.data);
+      
+      const results = response.data.data || [];
+      
+      console.log(`✅ Found ${results.length} real influencer profiles`);
+      console.log('📋 Results array:', results);
+      
+      setInfluencers(results);
+      
+      if (results.length === 0) {
+        alert('No influencers found. Try different search criteria or enter a specific username.');
+      }
+    } catch (error: any) {
       console.error('Failed to search influencers:', error);
-      alert('Failed to search influencers. Please try again.');
+      console.error('Error response:', error.response);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to search influencers';
+      alert(`⚠️ ${errorMessage}\n\nTip: Try entering a specific username for more accurate results.`);
     } finally {
       setSearching(false);
     }
@@ -164,9 +184,27 @@ export default function InfluencerPage() {
   const handleGenerateOutreach = async (influencer: Influencer) => {
     try {
       const response = await api.generateOutreach(influencer._id, {
-        campaignType: 'sponsored_post',
-        brandName: 'Your Brand',
-        campaignDetails: 'Product launch collaboration',
+        brandInfo: {
+          name: 'Your Brand',
+          industry: 'Marketing & Technology',
+        },
+        campaignDetails: {
+          name: 'Brand Collaboration',
+          objective: 'Increase brand awareness and engagement',
+          budgetRange: 'Negotiable',
+        },
+        // Include influencer data for search results (temp IDs)
+        influencerData: {
+          username: influencer.username,
+          displayName: influencer.displayName,
+          platform: influencer.platform,
+          profileUrl: `https://${influencer.platform}.com/${influencer.username}`,
+          avatarUrl: influencer.avatarUrl,
+          bio: `${influencer.category} influencer`,
+          category: [influencer.category],
+          followers: influencer.followers,
+          engagementRate: influencer.engagementRate,
+        },
       });
       setOutreachMessage(response.data.data?.message || '');
       setShowOutreach(true);
@@ -221,7 +259,7 @@ export default function InfluencerPage() {
   ];
 
   return (
-    <div className="hero-bg min-h-screen w-full text-white antialiased">
+    <div className="hero-bg min-h-screen w-full text-white antialiased" suppressHydrationWarning>
       <div className="max-w-7xl mx-auto p-6 lg:px-12 lg:py-10 space-y-6 sm:space-y-8">
         <div>
           <div className="flex items-center space-x-3 mb-2">
@@ -242,6 +280,20 @@ export default function InfluencerPage() {
           <div className="flex items-center space-x-2 mb-4">
             <MagnifyingGlassIcon className="w-5 h-5 text-blue-200" />
             <h2 className="text-lg sm:text-xl font-semibold text-white">Search Criteria</h2>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-white mb-2">🔍 Search Specific Username (Optional)</label>
+            <input
+              type="text"
+              value={searchParams.username}
+              onChange={(e) => setSearchParams({ ...searchParams, username: e.target.value })}
+              placeholder="e.g., therock, cristiano, kyliejenner"
+              className="form-field"
+            />
+            <p className="text-xs text-white/60 mt-1">
+              Leave empty to search by criteria, or enter a username to fetch real profile data
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -308,8 +360,122 @@ export default function InfluencerPage() {
           </div>
         </div>
 
-        {/* rest omitted for brevity in this snippet - you can keep your existing results / empty-state */}
-        {/* ... */}
+        {/* Results Section */}
+        {influencers.length > 0 && (
+          <div className="panel glass rounded-xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-2">
+                <SparklesIcon className="w-5 h-5 text-purple-300" />
+                <h2 className="text-lg sm:text-xl font-semibold text-white">
+                  Found {influencers.length} Influencers
+                </h2>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {influencers.map((influencer) => (
+                <div key={influencer._id} className="card glass rounded-xl p-4 hover:shadow-xl transition-shadow">
+                  <div className="flex items-start space-x-3 mb-4">
+                    <img
+                      src={influencer.avatarUrl || `https://ui-avatars.com/api/?name=${influencer.username}`}
+                      alt={influencer.displayName}
+                      className="w-14 h-14 rounded-full border-2 border-purple-400/30"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-white truncate">{influencer.displayName}</h3>
+                      <p className="text-sm text-white/70 truncate">@{influencer.username}</p>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span className="chip text-xs">{influencer.platform}</span>
+                        <span className="chip text-xs">{influencer.category}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/70">Followers</span>
+                      <span className="text-white font-semibold">{formatNumber(influencer.followers)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/70">Engagement</span>
+                      <span className="text-white font-semibold">{influencer.engagementRate.toFixed(2)}%</span>
+                    </div>
+                    {influencer.aiScore && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-white/70">AI Score</span>
+                        <span className={`font-bold ${getScoreColor(influencer.aiScore.overall)}`}>
+                          {influencer.aiScore.overall}/100
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handleGenerateOutreach(influencer)}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-linear-to-r from-purple-600 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
+                  >
+                    <ChatBubbleLeftIcon className="w-4 h-4" />
+                    <span>Generate Outreach</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {/* {!searching && influencers.length === 0 && (
+          <div className="panel glass rounded-xl p-8 sm:p-12 text-center">
+            <div className="mx-auto w-16 h-16 rounded-full bg-linear-to-r from-purple-600 to-blue-600 flex items-center justify-center mb-4">
+              <UserGroupIcon className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">Find Your Perfect Influencers</h3>
+            <p className="text-white/70 mb-4">
+              Use the search criteria above to discover influencers that match your brand
+            </p>
+            <p className="text-sm text-white/60">
+              🎯 Filter by platform, category, followers, and engagement rate
+            </p>
+          </div>
+        )} */}
+
+        {/* Outreach Message Modal */}
+        {showOutreach && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="panel glass rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-white">Generated Outreach Message</h3>
+                <button
+                  onClick={() => setShowOutreach(false)}
+                  className="text-white/70 hover:text-white transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="prose prose-invert max-w-none">
+                <pre className="whitespace-pre-wrap text-sm text-white/90 bg-white/5 p-4 rounded-lg border border-white/10">
+                  {outreachMessage}
+                </pre>
+              </div>
+              <div className="flex items-center gap-3 mt-6">
+                <button
+                  onClick={() => navigator.clipboard.writeText(outreachMessage)}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  📋 Copy to Clipboard
+                </button>
+                <button
+                  onClick={() => setShowOutreach(false)}
+                  className="flex-1 px-4 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* --- Styles --- */}

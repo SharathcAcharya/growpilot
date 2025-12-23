@@ -261,7 +261,13 @@ export const generateCampaignCreative = async (req: AuthRequest, res: Response):
   try {
     const userId = req.user?.uid;
     const { id } = req.params;
-    const { brandName, industry, targetAudience, tone, additionalContext } = req.body;
+    const { brandName, industry, objective, targetAudience, tone, platform, additionalContext } = req.body;
+
+    console.log('🎨 Generate Creative Request:', { 
+      userId, 
+      campaignId: id, 
+      body: req.body 
+    });
 
     if (!userId) {
       res.status(401).json({ success: false, message: 'Unauthorized' });
@@ -280,84 +286,62 @@ export const generateCampaignCreative = async (req: AuthRequest, res: Response):
       return;
     }
 
+    // Use objective from request body or fall back to campaign objective
+    const finalObjective = objective || campaign.objective || 'increase engagement';
+    const finalPlatform = platform || campaign.platform || 'social media';
+
+    console.log('📝 Generating creative with params:', {
+      brandName,
+      industry,
+      objective: finalObjective,
+      targetAudience,
+      tone,
+      platform: finalPlatform,
+    });
+
     // Generate text creative
     const creativeResult = await AIService.generateAdCreative({
       brandName,
       industry,
-      objective: campaign.objective,
+      objective: finalObjective,
       targetAudience,
       tone,
-      platform: campaign.platform,
+      platform: finalPlatform,
       additionalContext,
     });
+
+    console.log('✨ Creative result:', { success: creativeResult.success, error: creativeResult.error });
 
     if (!creativeResult.success) {
       res.status(500).json({
         success: false,
-        message: 'Failed to generate creative',
+        message: creativeResult.error || 'Failed to generate creative',
       });
       return;
     }
 
-    // Optionally generate image
-    let imageUrl;
-    if (req.body.generateImage) {
-      const imagePrompt = `${brandName} ${campaign.objective} ad for ${industry}, targeting ${targetAudience}`;
-      const imageResult = await AIService.generateImage(imagePrompt);
-      if (imageResult.success) {
-        imageUrl = imageResult.url;
-      }
-    }
+    console.log('✅ Creative generated successfully, returning data');
 
-    // Create creative objects
-    type CreativeType = {
-      id: string;
-      type: 'image' | 'video' | 'carousel';
-      url: string;
-      thumbnail?: string;
-      headline: string;
-      description: string;
-      cta: string;
-      aiGenerated: boolean;
-      prompt?: string;
-    };
-
-    const creatives: CreativeType[] = [];
-    const headlines = creativeResult.data.headlines || [];
-    const descriptions = creativeResult.data.descriptions || [];
-    const ctas = creativeResult.data.ctas || [];
-
-    for (let i = 0; i < Math.min(headlines.length, 3); i++) {
-      creatives.push({
-        id: uuidv4(),
-        type: 'image' as const,
-        url: imageUrl || '',
-        headline: headlines[i],
-        description: descriptions[i] || '',
-        cta: ctas[i] || 'Learn More',
-        aiGenerated: true,
-        prompt: req.body.additionalContext || '',
-      });
-    }
-
-    // Update campaign with creatives
-    for (const creative of creatives) {
-      campaign.creatives.push(creative);
-    }
-    await campaign.save();
-
+    // Return generated content without saving to campaign
+    // User can choose to use it via "Use in Post" button
     res.json({
       success: true,
       data: {
-        creatives,
+        headlines: creativeResult.data.headlines || [],
+        descriptions: creativeResult.data.descriptions || [],
+        ctas: creativeResult.data.ctas || [],
         tokensUsed: creativeResult.tokensUsed,
       },
     });
   } catch (error: any) {
-    console.error('Generate Creative Error:', error);
+    console.error('❌ Generate Creative Error:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to generate creative',
+      error: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 };

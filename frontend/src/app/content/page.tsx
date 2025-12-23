@@ -97,7 +97,10 @@ export default function ContentPage() {
       
       let errorMessage = 'Failed to generate content. Please try again.';
       
-      if (error.response) {
+      if (error.code === 'ECONNABORTED') {
+        // Timeout error
+        errorMessage = '⏱️ Request timed out. The AI is taking longer than expected. Try again with a simpler topic or check your internet connection.';
+      } else if (error.response) {
         // Server responded with error
         errorMessage = error.response.data?.message || error.response.data?.error || errorMessage;
         // eslint-disable-next-line no-console
@@ -105,7 +108,7 @@ export default function ContentPage() {
         console.error('Status:', error.response.status);
       } else if (error.request) {
         // Request made but no response
-        errorMessage = 'Cannot connect to server. Please check if the backend is running on port 5000.';
+        errorMessage = '⚠️ Cannot connect to server. Please make sure the backend is running on http://localhost:5000';
         // eslint-disable-next-line no-console
         console.error('No response from server:', error.request);
       } else {

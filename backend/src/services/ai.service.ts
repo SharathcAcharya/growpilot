@@ -69,6 +69,7 @@ Format as JSON with keys: headlines, descriptions, ctas
           },
         ],
         temperature: 0.8,
+        max_tokens: 1000,
         response_format: { type: 'json_object' },
       });
 
@@ -156,6 +157,7 @@ ${params.type === 'blog' ? '- Include meta title and meta description for SEO' :
           },
         ],
         temperature: 0.7,
+        max_tokens: 2000,
       });
 
       const content = response.choices[0]?.message?.content || '';
@@ -215,6 +217,7 @@ Format as JSON with keys: score, titleSuggestions, metaSuggestions, issues, quic
           },
         ],
         temperature: 0.3,
+        max_tokens: 1500,
         response_format: { type: 'json_object' },
       });
 
@@ -279,6 +282,7 @@ Format as JSON with keys: relevance, authenticity, reach, engagement, overall, c
           },
         ],
         temperature: 0.4,
+        max_tokens: 800,
         response_format: { type: 'json_object' },
       });
 
@@ -344,6 +348,7 @@ Format as JSON with keys: assessment, optimizations, budgetSuggestions, targetin
           },
         ],
         temperature: 0.5,
+        max_tokens: 1500,
         response_format: { type: 'json_object' },
       });
 

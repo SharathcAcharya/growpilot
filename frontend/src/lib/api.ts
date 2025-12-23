@@ -6,7 +6,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_URL,
-  timeout: 30000,
+  timeout: 120000, // 120 seconds for AI operations
   headers: {
     'Content-Type': 'application/json',
   },
@@ -62,6 +62,7 @@ export const api = {
   updateCampaign: (id: string, data: any) => apiClient.put(`/campaigns/${id}`, data),
   deleteCampaign: (id: string) => apiClient.delete(`/campaigns/${id}`),
   generateCreative: (id: string, data: any) => apiClient.post(`/campaigns/${id}/generate-creative`, data),
+  generateCampaignCreative: (id: string, data: any) => apiClient.post(`/campaigns/${id}/generate-creative`, data),
   deployCampaign: (id: string) => apiClient.post(`/campaigns/${id}/deploy`),
   optimizeCampaign: (id: string) => apiClient.post(`/campaigns/${id}/optimize`),
   getCampaignAnalytics: (id: string) => apiClient.get(`/campaigns/${id}/analytics`),

@@ -197,40 +197,65 @@ export const generateOutreach = async (req: AuthRequest, res: Response): Promise
       return;
     }
 
-    const influencer = await Influencer.findOne({ _id: id, userId: user._id });
-    if (!influencer) {
-      res.status(404).json({ success: false, message: 'Influencer not found' });
-      return;
+    const { brandInfo, campaignDetails, influencerData } = req.body;
+
+    let influencerProfile;
+
+    // Check if influencer data is provided directly (for search results)
+    if (influencerData) {
+      console.log('Using provided influencer data for outreach generation');
+      influencerProfile = {
+        username: influencerData.username,
+        displayName: influencerData.displayName,
+        platform: influencerData.platform,
+        profileUrl: influencerData.profileUrl || `https://${influencerData.platform}.com/${influencerData.username}`,
+        avatarUrl: influencerData.avatarUrl,
+        bio: influencerData.bio || '',
+        category: influencerData.category || [],
+        followers: influencerData.followers,
+        following: influencerData.following || 0,
+        posts: influencerData.posts || 0,
+        avgLikes: influencerData.avgLikes || 0,
+        avgComments: influencerData.avgComments || 0,
+        avgViews: influencerData.avgViews,
+        engagementRate: influencerData.engagementRate,
+      };
+    } else {
+      // Try to fetch from database (for saved influencers)
+      const influencer = await Influencer.findOne({ _id: id, userId: user._id });
+      if (!influencer) {
+        res.status(404).json({ success: false, message: 'Influencer not found. Please provide influencer data.' });
+        return;
+      }
+
+      // Map influencer to InfluencerProfile format
+      influencerProfile = {
+        username: influencer.username,
+        displayName: influencer.displayName,
+        platform: influencer.platform,
+        profileUrl: influencer.profileUrl,
+        avatarUrl: influencer.avatarUrl,
+        bio: influencer.bio,
+        category: influencer.category,
+        followers: influencer.metrics.followers,
+        following: influencer.metrics.following,
+        posts: influencer.metrics.posts,
+        avgLikes: influencer.metrics.avgLikes,
+        avgComments: influencer.metrics.avgComments,
+        avgViews: influencer.metrics.avgViews,
+        engagementRate: influencer.metrics.engagementRate,
+      };
     }
-
-    const { brandInfo, campaignDetails } = req.body;
-
-    // Map influencer to InfluencerProfile format
-    const influencerProfile = {
-      username: influencer.username,
-      displayName: influencer.displayName,
-      platform: influencer.platform,
-      profileUrl: influencer.profileUrl,
-      avatarUrl: influencer.avatarUrl,
-      bio: influencer.bio,
-      category: influencer.category,
-      followers: influencer.metrics.followers,
-      following: influencer.metrics.following,
-      posts: influencer.metrics.posts,
-      avgLikes: influencer.metrics.avgLikes,
-      avgComments: influencer.metrics.avgComments,
-      avgViews: influencer.metrics.avgViews,
-      engagementRate: influencer.metrics.engagementRate,
-    };
 
     const template = await InfluencerService.generateOutreachTemplate(
       influencerProfile,
-      brandInfo,
-      campaignDetails
+      brandInfo || { name: 'Your Brand', industry: 'Marketing' },
+      campaignDetails || { name: 'Brand Collaboration', objective: 'Increase brand awareness' }
     );
 
-    res.json({ success: true, data: { template } });
+    res.json({ success: true, data: { message: template } });
   } catch (error: any) {
+    console.error('Generate Outreach Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

@@ -56,7 +56,12 @@ export default function RegisterPage() {
     return nameRegex.test(trimmedName);
   };
 
-  // Removed auto-redirect - let user choose to logout or go to dashboard
+  // Auto-logout when visiting register page for security
+  useEffect(() => {
+    if (firebaseUser) {
+      handleLogout();
+    }
+  }, []); // Only run once when mounted
 
   const handleLogout = async () => {
     try {
@@ -309,34 +314,6 @@ export default function RegisterPage() {
           </svg>
           <span>Back to Home</span>
         </button>
-
-        {/* Already Logged In Warning */}
-        {firebaseUser && (
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-            <div className="flex items-start space-x-2 sm:space-x-3">
-              <span className="text-xl sm:text-2xl">👤</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-blue-300 font-semibold mb-2">
-                  You're already logged in as {firebaseUser.email}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <button
-                    onClick={() => router.push('/dashboard')}
-                    className="px-3 sm:px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Go to Dashboard
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="px-3 sm:px-4 py-2 bg-gray-700 text-white text-xs sm:text-sm rounded-lg hover:bg-gray-600 transition-colors"
-                  >
-                    Logout & Create New Account
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Logo and Title */}
         <div className="text-center mb-6 sm:mb-8 animate-fade-in">
